@@ -1,0 +1,8 @@
+# Windows executables
+*.exe
+*.dll
+*.lib
+
+# macOS executables
+*.app
+*.dylib
