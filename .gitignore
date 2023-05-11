@@ -6,3 +6,6 @@
 # macOS executables
 *.app
 *.dylib
+
+# vscode settings
+.vscode/
