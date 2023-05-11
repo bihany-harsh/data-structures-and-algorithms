@@ -10,6 +10,13 @@ class Graph
 public:
     int V;
 
+    int *DFN = new int[V];
+    int *High_point = new int[V];
+    int *visited = new int[V];
+    int *parent = new int[V];
+    int *articulation_point = new int[V];
+    int dfn = 0;
+
     list<int> *adj;
 
     Graph(int V)
@@ -25,6 +32,8 @@ public:
 
     void BFS(int x);
     bool isBipartite();
+    void DFS_traversal();
+    void DFS_for_biconnectedness(int x);
 };
 
 void Graph::BFS(int x)
@@ -40,7 +49,7 @@ void Graph::BFS(int x)
     q.push(x);
 
     cout << x << " (" << distance[x] << ")" << endl;
-    while(!q.empty())
+    while (!q.empty())
     {
         // dequeuing
         int v = q.front();
@@ -51,7 +60,7 @@ void Graph::BFS(int x)
             {
                 distance[*i] = distance[v] + 1;
                 q.push(*i);
-                cout << *i << " (" << distance[*i] << ")"<< endl;
+                cout << *i << " (" << distance[*i] << ")" << endl;
             }
         }
     }
@@ -79,7 +88,7 @@ bool Graph::isBipartite()
             visited[i] = 1;
             color[i] = 0;
 
-            while(!q.empty())
+            while (!q.empty())
             {
                 int v = q.front();
                 q.pop();
@@ -100,6 +109,50 @@ bool Graph::isBipartite()
     return true;
 }
 
+void Graph::DFS_for_biconnectedness(int x)
+{
+    visited[x] = 1;
+    DFN[x] = dfn++;
+    High_point[x] = INT_MAX;
+
+    cout << x << endl;
+    for (auto i = adj[x].begin(); i != adj[x].end(); i++)
+    {
+        if (visited[*i] == 0)
+        {
+            parent[*i] = x;
+            DFS_for_biconnectedness(*i);
+            High_point[x] = min(High_point[x], High_point[*i]);
+            if (High_point[*i] >= DFN[x])
+            {
+                articulation_point[x] = 1;
+            }
+        }
+        else if (*i != parent[x])
+        {
+            High_point[x] = min(High_point[x], DFN[*i]);
+        }
+    }
+}
+
+void Graph::DFS_traversal()
+{
+    int *visited = new int[V];
+    int *articulation_points = new int[V];
+
+    for (int i = 0; i < V; i++)
+    {
+        visited[i] = 0;
+    }
+    for (int i = 0; i < V; i++)
+    {
+        if (visited[i] == 0)
+        {
+            DFS_for_biconnectedness(i);
+        }
+    }
+}
+
 int main()
 {
     Graph g(6);
@@ -111,9 +164,22 @@ int main()
     g.addEdge(2, 3);
     g.addEdge(2, 5);
 
+    cout << "BFS: " << endl;
     g.BFS(0);
-    cout << endl << "Is Bipartite: " << g.isBipartite() << endl;
+    cout << endl
+         << "Is Bipartite: " << g.isBipartite() << endl;
+    cout << endl
+         << "DFS: " << endl;
 
+    g.DFS_traversal();
+
+    int *AP = g.articulation_point;
+    cout << endl
+         << "Articulation Points: " << endl;
+    for (int i = 0; i < g.V; i++)
+    {
+        cout << i << " (" << AP[i] << ")" << " ";
+    }
 
     return 0;
 }
