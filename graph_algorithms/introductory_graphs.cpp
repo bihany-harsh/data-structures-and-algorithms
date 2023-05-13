@@ -4,39 +4,47 @@
 #include <limits.h>
 using namespace std;
 
+int WHITE = 0;
+int GRAY = 1;
+int BLACK = 2;
+
 class Graph
 {
 public:
-    int V;
-    list<int> *adjacency_list;
-    bool is_directed;
+    int V;    // No. of vertices
+    int time; // Global variable to keep track of time
+    int dfn;
+    list<int> *adjacency_list; // Adjacency lists
+    int *color;                // To store color of vertices
+    int *parent;               // To store parent of vertices
+    int *d;                    // Discovery time
+    int *f;                    // Finishing time
+    int *DFN;
 
-    // subsidiary arrays for DFS related algos
-    int *visited = new int[V];
-    int *parent = new int[V];
-    int *DFN = new int[V];
-    int dfn = 0;
-    //
-
-    Graph(int V, bool is_directed)
+    // Constructor
+    Graph(int V)
     {
         this->V = V;
         adjacency_list = new list<int>[V];
-        this->is_directed = is_directed;
+        color = new int[V];
+        parent = new int[V];
+        d = new int[V];
+        f = new int[V];
+        DFN = new int[V];
     }
 
     void add_edge(int u, int v);
     void display_graph();
     void BFS(int x);
-    void DFS(int x);
-    void DFS_traversal();
+    void DFS();
+    void DFS_visit(int v);
+    void display_dfs();
 };
 
 void Graph::add_edge(int u, int v)
 {
     adjacency_list[u].push_back(v);
-    if (!is_directed)
-        adjacency_list[v].push_back(u);
+    adjacency_list[v].push_back(u);
 }
 
 void Graph::display_graph()
@@ -84,39 +92,56 @@ void Graph::BFS(int x)
     }
 }
 
-void Graph::DFS(int x)
+void Graph::DFS_visit(int v)
 {
-    visited[x] = 1;
-    DFN[x] = dfn++;
-
-    cout << x << " (" << DFN[x] << ")" << endl;
-
-    for (auto v = adjacency_list[x].begin(); v != adjacency_list[x].end(); v++)
     {
-        if (visited[*v] == 0)
+        color[v] = 1; // GRAY
+        time++;
+        d[v] = time;
+        DFN[v] = ++dfn;
+        for (auto i = adjacency_list[v].begin(); i != adjacency_list[v].end(); ++i)
         {
-            parent[*v] = x;
-            DFS(*v);
+            if (color[*i] == 0)
+            { // WHITE
+                parent[*i] = v;
+                DFS_visit(*i);
+            }
+        }
+        color[v] = 2; // BLACK
+        time++;
+        f[v] = time;
+    }
+}
+
+void Graph::DFS()
+{
+    for (int i = 0; i < V; i++)
+    {
+        color[i] = 0;   // WHITE
+        parent[i] = -1; // NIL
+    }
+    time = 0;
+    for (int i = 0; i < V; i++)
+    {
+        if (color[i] == 0)
+        { // WHITE
+            DFS_visit(i);
         }
     }
 }
 
-void Graph::DFS_traversal()
+void Graph::display_dfs()
 {
     for (int i = 0; i < V; i++)
     {
-        visited[i] = 0;
-    }
-    for (int i = 0; i < V; i++)
-    {
-        if (!visited[i])
-            DFS(i);
+        cout << "Vertex: " << i << ", Discovery time: " << d[i]
+             << ", Finishing time: " << f[i] << ", DFN: " << DFN[i] << endl;
     }
 }
 
 int main()
 {
-    Graph g(6, false);
+    Graph g(6);
 
     g.add_edge(0, 5);
     g.add_edge(0, 4);
@@ -127,8 +152,11 @@ int main()
     g.display_graph();
 
     g.BFS(0);
+    cout << endl;
 
-    g.DFS_traversal();
+    g.DFS();
+    cout << endl;
+    g.display_dfs();
 
     return 0;
 }
