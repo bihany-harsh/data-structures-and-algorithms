@@ -50,9 +50,15 @@ bool is_scrambled_string_util(string s1, string s2, unordered_map<string, bool> 
     for (int i = 1; i < n; i++)
     {
         if (is_scrambled_string_rec(s1.substr(0, i), s2.substr(0, i)) && is_scrambled_string_rec(s1.substr(i, n - i), s2.substr(i, n - i)))
+        {
+            dp[key] = true;
             return true;
+        }
         if (is_scrambled_string_rec(s1.substr(0, i), s2.substr(n - i, i)) && is_scrambled_string_rec(s1.substr(i, n - i), s2.substr(0, n - i)))
-            return true; 
+        {
+            dp[key] = true;
+            return true;
+        }
     }
     dp[key] = false;
     return false;
