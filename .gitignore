@@ -10,3 +10,5 @@
 # vscode settings
 .vscode/
 .DS_Store
+
+/code-dump/.vscode
