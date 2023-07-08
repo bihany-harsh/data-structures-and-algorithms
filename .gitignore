@@ -13,3 +13,7 @@
 
 /code-dump/.vscode
 **/.cph
+
+**/.idea
+**cmake-build-debug/
+CMakeLists.txt
